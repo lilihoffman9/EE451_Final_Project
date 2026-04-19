@@ -1,20 +1,22 @@
-# EE451 graph coloring — Phase 1 toolchain
+# EE451 graph coloring — build from repo root
+# Layout: algorithms/ = coloring implementations; supportingFiles/ = I/O, graph, driver, scripts
 # Usage:
-#   make                    # build bin/coloring
+#   make
 #   make run GRAPH=data/email-EuAll.txt THREADS=8
+#   ./supportingFiles/scripts/bench_sequential_all.sh
+#
+# Datasets: download_snap_datasets.sh skips files that already exist (re-run is cheap).
+# On cloud, set EE451_DATA_DIR to persistent storage so graphs survive instance refresh, e.g.:
+#   export EE451_DATA_DIR=/mnt/your-ebs/snap
 #
 # macOS (Homebrew): brew install libomp
-#   export CXX=clang++
-#   export CPPFLAGS="-I$(brew --prefix libomp)/include"
-#   export LDFLAGS="-L$(brew --prefix libomp)/lib -lomp"
 
 CXX ?= g++
-CPPFLAGS += -Iinclude
+CPPFLAGS += -IsupportingFiles/include -Ialgorithms
 CXXFLAGS += -std=c++17 -O3 -Wall -Wextra
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
-  # Apple Clang: OpenMP comes from Homebrew libomp (`brew install libomp`).
   LIBOMP_PREFIX := $(shell brew --prefix libomp 2>/dev/null)
   ifeq ($(LIBOMP_PREFIX),)
     ifneq ($(wildcard /opt/homebrew/opt/libomp/include/omp.h),)
@@ -35,17 +37,14 @@ else
 endif
 
 THREADS ?= 4
-# After `./scripts/download_snap_datasets.sh`, use e.g. data/email-EuAll.txt
-GRAPH ?= fixtures/tiny_edges.txt
+GRAPH ?= supportingFiles/fixtures/tiny_edges.txt
 
-SRCS := src/main.cpp src/load_snap.cpp src/validate.cpp src/greedy_sequential.cpp
-OBJS := $(SRCS:.cpp=.o)
+OBJS := build/main.o build/load_snap.o build/validate.o build/greedy_sequential.o
 
 .PHONY: all clean rebuild run
 
 all: bin/coloring
 
-# Use after upgrading libomp/toolchain, or when you expect a full recompile:
 rebuild: clean all
 
 bin/coloring: $(OBJS) | bin
@@ -54,13 +53,25 @@ bin/coloring: $(OBJS) | bin
 bin:
 	mkdir -p bin
 
-src/%.o: src/%.cpp
+build:
+	mkdir -p build
+
+build/main.o: supportingFiles/src/main.cpp | build
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -MMD -MP -c $< -o $@
+
+build/load_snap.o: supportingFiles/src/load_snap.cpp | build
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -MMD -MP -c $< -o $@
+
+build/validate.o: supportingFiles/src/validate.cpp | build
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -MMD -MP -c $< -o $@
+
+build/greedy_sequential.o: algorithms/greedy_sequential.cpp | build
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -MMD -MP -c $< -o $@
 
 clean:
-	rm -f $(OBJS) src/*.d bin/coloring
+	rm -rf build bin
 
 run: all
 	OMP_NUM_THREADS=$(THREADS) ./bin/coloring $(GRAPH) $(THREADS)
 
--include $(OBJS:.o=.d)
+-include build/main.d build/load_snap.d build/validate.d build/greedy_sequential.d

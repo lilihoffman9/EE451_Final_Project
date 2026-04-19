@@ -3,6 +3,8 @@
         {
             "name": "Mac",
             "includePath": [
+                "${workspaceFolder}/algorithms",
+                "${workspaceFolder}/supportingFiles/include",
                 "${workspaceFolder}/**",
                 "/usr/local/include",
                 "/opt/homebrew/opt/libomp/include"

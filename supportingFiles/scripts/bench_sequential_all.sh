@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
-# Run sequential greedy on all four SNAP graphs in data/ (after download_snap_datasets.sh).
+# Run sequential greedy on all four SNAP graphs (after download_snap_datasets.sh).
+# Invoke from repo root; script lives under supportingFiles/scripts/.
+#
+# Graphs are read from EE451_DATA_DIR if set, else <repo>/data. Match download_snap_datasets.sh.
+#
 set -euo pipefail
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+DATA="${EE451_DATA_DIR:-${ROOT}/data}"
 BIN="${ROOT}/bin/coloring"
 THREADS="${THREADS:-8}"
 
@@ -14,18 +19,17 @@ echo "==========================================================================
 echo "Sequential greedy baseline  |  OMP_NUM_THREADS=${THREADS}  |  T_seq = median of 5 runs"
 echo "================================================================================"
 echo ""
-# Column widths match ./bin/coloring --brief (non-CSV) output.
 printf '%-28s %12s %14s %8s %8s %16s\n' "dataset" "n" "m" "valid" "colors" "T_seq_s"
 echo "--------------------------------------------------------------------------------"
 
 for f in \
-  "${ROOT}/data/email-EuAll.txt" \
-  "${ROOT}/data/com-Youtube.txt" \
-  "${ROOT}/data/com-LiveJournal.txt" \
-  "${ROOT}/data/roadNet-CA.txt"; do
+  "${DATA}/email-EuAll.txt" \
+  "${DATA}/com-Youtube.txt" \
+  "${DATA}/com-LiveJournal.txt" \
+  "${DATA}/roadNet-CA.txt"; do
   base="$(basename "${f}")"
   if [[ ! -f "${f}" ]]; then
-    printf '%s\t%s\t%s\t%s\t%s\t%s\n' "${base}" "-" "-" "skip" "-" "-"
+    printf '%-28s %12s %14s %8s %8s %16s\n' "${base}" "-" "-" "skip" "-" "-"
     continue
   fi
   echo "  … running ${base}" >&2
@@ -33,4 +37,4 @@ for f in \
 done
 
 echo ""
-echo "Tip: one graph with full details —  ./bin/coloring \"${ROOT}/data/email-EuAll.txt\" ${THREADS}"
+echo "Tip: one graph with full details —  ./bin/coloring \"${DATA}/email-EuAll.txt\" ${THREADS}"

@@ -4,7 +4,7 @@
 /bin/
 build/
 
-# Datasets (large; download with scripts/download_snap_datasets.sh)
+# Datasets (large; download with supportingFiles/scripts/download_snap_datasets.sh)
 data/
 
 # Python

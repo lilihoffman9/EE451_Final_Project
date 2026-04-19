@@ -75,7 +75,8 @@ int main(int argc, char **argv) {
   GreedySequentialStats last;
   const double t_seq =
       median_wall_seconds([&]() { last = greedy_sequential_first_fit(g); }, 5);
-  const bool ok = validate_coloring(g, last.color);
+  const auto conflict = first_monochromatic_edge(g, last.color);
+  const bool ok = !conflict.has_value();
 
   const std::string dataset = std::filesystem::path(path).filename().string();
 
@@ -101,6 +102,12 @@ int main(int argc, char **argv) {
   std::cout << "  nnz (CSR entries): " << g.row_ptr[static_cast<std::size_t>(g.n)] << "\n";
 
   std::cout << "Sequential greedy: valid coloring? " << (ok ? "yes" : "no") << "\n";
+  if (!ok && conflict.has_value()) {
+    const std::int32_t u = conflict->first;
+    const std::int32_t v = conflict->second;
+    std::cout << "  (invalid: edge/arc in CSR with same color — u=" << u << " v=" << v
+              << ", color=" << last.color[static_cast<std::size_t>(u)] << ")\n";
+  }
   std::cout << "  colors used: " << last.num_colors << "\n";
   {
     std::cout << std::fixed << std::setprecision(9);

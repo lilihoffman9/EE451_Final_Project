@@ -38,7 +38,7 @@ THREADS ?= 4
 # After `./scripts/download_snap_datasets.sh`, use e.g. data/email-EuAll.txt
 GRAPH ?= fixtures/tiny_edges.txt
 
-SRCS := src/main.cpp src/load_snap.cpp src/validate.cpp
+SRCS := src/main.cpp src/load_snap.cpp src/validate.cpp src/greedy_sequential.cpp
 OBJS := $(SRCS:.cpp=.o)
 
 .PHONY: all clean rebuild run

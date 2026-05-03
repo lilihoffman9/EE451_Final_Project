@@ -81,4 +81,3 @@ Downloads four SNAP graphs to `data/` (or `$EE451_DATA_DIR` if set).
 
 ## Authors
 - Lili Hoffman, Anoushka Narayan, Kayal Bhatia</content>
-<parameter name="filePath">c:\Users\anous\Desktop\SeniorSpring\EE451\EE451_Final_Project\README.md

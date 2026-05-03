@@ -97,17 +97,17 @@ int main(int argc, char **argv) {
   if (brief) {
     if (csv) {
       std::cout << dataset << ',' << g.n << ',' << g.num_undirected_edges << ','
-                << (ok ? "ok" : "FAIL") << ',' << last.num_colors << ',';
+                << (seq_ok ? "ok" : "FAIL") << ',' << seq_last.num_colors << ',';
       std::cout << std::fixed << std::setprecision(9) << t_seq << '\n';
     } else {
       // Fixed-width row so terminals without tab alignment still look like a table.
-      const std::string vlabel = ok ? "ok" : "FAIL";
+      const std::string vlabel = seq_ok ? "ok" : "FAIL";
       std::cout << std::left << std::setw(28) << dataset << std::right << std::setw(12) << g.n
                 << std::setw(14) << g.num_undirected_edges << std::setw(8) << vlabel << std::setw(8)
-                << last.num_colors;
+                << seq_last.num_colors;
       std::cout << std::setw(16) << std::fixed << std::setprecision(9) << t_seq << '\n';
     }
-    return ok ? 0 : 2;
+    return seq_ok ? 0 : 2;
   }
 
   std::cout << "Loaded " << path << "\n";

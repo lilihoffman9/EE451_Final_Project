@@ -39,7 +39,7 @@ endif
 THREADS ?= 4
 GRAPH ?= supportingFiles/fixtures/tiny_edges.txt
 
-OBJS := build/main.o build/load_snap.o build/validate.o build/greedy_sequential.o
+OBJS := build/main.o build/load_snap.o build/validate.o build/greedy_sequential.o build/speculative_parallel.o build/jones_plassman.o
 
 .PHONY: all clean rebuild run
 
@@ -68,10 +68,16 @@ build/validate.o: supportingFiles/src/validate.cpp | build
 build/greedy_sequential.o: algorithms/greedy_sequential.cpp | build
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -MMD -MP -c $< -o $@
 
+build/speculative_parallel.o: algorithms/speculative_parallel.cpp | build
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -MMD -MP -c $< -o $@
+
+build/jones_plassman.o: algorithms/jones_plassman.cpp | build
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -MMD -MP -c $< -o $@
+
 clean:
 	rm -rf build bin
 
 run: all
 	OMP_NUM_THREADS=$(THREADS) ./bin/coloring $(GRAPH) $(THREADS)
 
--include build/main.d build/load_snap.d build/validate.d build/greedy_sequential.d
+-include build/main.d build/load_snap.d build/validate.d build/greedy_sequential.d build/speculative_parallel.d build/jones_plassman.d
